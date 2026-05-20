@@ -5,17 +5,17 @@ import FeaturedRoomCard from "./FeaturedRoomCard";
 
 const fetchFeaturedRooms = async () => {
   try {
-    // 💡 Point this to /featured-rooms instead of the text-based root / route
-   const res = await fetch("http://localhost:5000/featured-rooms", {
-  next: { revalidate: 0 }, // 
-});
+    // 💡 Using your correct port 8080 configuration with a safe timeout
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8080";
+    const res = await fetch(`${baseUrl}/featured-rooms`, {
+      next: { revalidate: 0 },
+      signal: AbortSignal.timeout(1200)
+    });
     
     if (!res.ok) throw new Error("Failed to fetch featured rooms");
-    const data = await res.json();
-    
-    return data; 
+    return await res.json(); 
   } catch (error) {
-    console.error("Error fetching featured rooms:", error);
+    console.error("Error fetching featured rooms:", error.message);
     return [];
   }
 };
@@ -52,11 +52,20 @@ const FeaturedRooms = async () => {
           </Link>
         </div>
 
-        {/* Responsive Grid View for 4 Items */}
+        {/* Responsive Grid View */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {rooms?.map((room) => (
-            <FeaturedRoomCard key={room._id} room={room} />
-          ))}
+          {rooms && rooms.length > 0 ? (
+            rooms.map((room) => (
+              <FeaturedRoomCard key={room._id} room={room} />
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12 bg-white rounded-2xl border border-slate-200/50 p-6 shadow-xs max-w-md mx-auto">
+              <p className="text-sm font-medium text-slate-600 mb-1">No featured rooms found</p>
+              <p className="text-xs text-slate-400">
+                Please confirm your backend service is running on port 8080.
+              </p>
+            </div>
+          )}
         </div>
         
       </div>

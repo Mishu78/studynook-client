@@ -94,7 +94,7 @@ export function MainNavbar() {
                   <Image
                     width={40}
                     height={40}
-                    src={session?.user?.image || "/public/assets/hero-cover.jpg"}
+                    src={session?.user?.image || "/assets/hero-cover.jpg"}
                     alt="avatar"
                     className="w-9 h-9 rounded-full object-cover ring-2 ring-[#1b4332]/10"
                   />
