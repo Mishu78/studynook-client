@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { BookOpen, Menu, X, User, LogOut, LayoutDashboard, Moon, Sun } from "lucide-react";
+import { LibraryBig, Menu, X, User, LogOut, LayoutDashboard, Moon, Sun } from "lucide-react";
 import LinkComponent from "next/link";
 import { Button } from "@heroui/react";
 import Image from "next/image";
@@ -55,10 +55,11 @@ export function MainNavbar() {
           <div className="flex items-center">
             <LinkComponent href="/" className="flex items-center gap-2 group">
               <div className="p-2 bg-[#1b4332] dark:bg-emerald-600 rounded-lg text-white">
-                <BookOpen className="w-5 h-5" />
+                <LibraryBig className="w-5 h-5" />
               </div>
-              <span className="font-bold text-xl tracking-tight text-[#1b4332] dark:text-emerald-400">
-                StudyNook
+              <span className="font-bold text-xl tracking-tight">
+                <span className="text-sky-500">Study</span>
+                <span className="text-[#1b4332] dark:text-emerald-400">Nook</span>
               </span>
             </LinkComponent>
           </div>
