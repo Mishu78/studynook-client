@@ -11,7 +11,7 @@ const auth = betterAuth({
     client
   }),
   // 💡 Explicitly set secret keys so tokens can sign correctly on port 8080
-  secret: process.env.BETTER_AUTH_SECRET || "cQbLOo7y7bEhMKpf1acCp5mBXgDSLvFW",
+  secret: process.env.BETTER_AUTH_SECRET,
   baseURL: "http://localhost:8080", 
   
   // 💡 MANDATORY: Enable Email & Password signups on the server instance
