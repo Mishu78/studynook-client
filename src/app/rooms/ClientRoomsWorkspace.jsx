@@ -26,32 +26,24 @@ export default function ClientRoomsWorkspace({ initialRooms = [] }) {
   ];
 
   // Client-side Search and Filtering Logic
-  useEffect(() => {
-    let result = rooms || [];
-
-    if (searchName.trim() !== "") {
-      result = result.filter((room) =>
-        room.roomName?.toLowerCase().includes(searchName.toLowerCase())
-      );
-    }
-
-    if (selectedAmenities.length > 0) {
-      result = result.filter((room) =>
-        selectedAmenities.every((amenity) => room.amenities?.includes(amenity))
-      );
-    }
-
-    if (minPrice !== "") {
-      result = result.filter((room) => room.hourlyRate >= parseFloat(minPrice));
-    }
-
-    if (maxPrice !== "") {
-      result = result.filter((room) => room.hourlyRate <= parseFloat(maxPrice));
-    }
-
-    setFilteredRooms(result);
-  }, [searchName, selectedAmenities, minPrice, maxPrice, rooms]);
-
+useEffect(() => {
+  const fetchFilteredRooms = async () => {
+    // Construct query string
+    const params = new URLSearchParams({
+      search: searchName,
+      amenities: selectedAmenities.join(','),
+      minPrice,
+      maxPrice
+    });
+    
+    // Fetch from your backend API
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/rooms?${params}`);
+    const data = await res.json();
+    setFilteredRooms(data); // Update state with DB results
+  };
+  
+  fetchFilteredRooms();
+}, [searchName, selectedAmenities, minPrice, maxPrice]);
   const handleAmenityChange = (amenity) => {
     if (selectedAmenities.includes(amenity)) {
       setSelectedAmenities(selectedAmenities.filter((a) => a !== amenity));
