@@ -1,86 +1,80 @@
 "use client";
+
 import { Button } from "@heroui/react";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import Image from "next/image";
 
 const Hero = () => {
   return (
-    <section className="relative w-full min-h-[calc(100vh-80px)] bg-[#1e4620] bg-radial-[at_top_right] from-[#386b52] via-[#1e4620] to-[#163525] flex items-center py-16 md:py-24">
-      {/* Subtle Grid Dot Pattern Background overlay overlaying the green */}
-      <div className="absolute inset-0 opacity-[0.04] pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+    <section className="relative w-full py-16 md:py-24 overflow-hidden bg-gradient-to-br from-sky-50 via-emerald-50 to-amber-50 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      
+      {/* Subtle Pattern Overlay */}
+      <div className="absolute inset-0 opacity-[0.4] pointer-events-none bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:20px_20px]"></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           
-          {/* Left Text and Analytics Column */}
-          <div className="space-y-6 text-left">
-            {/* Tag badge */}
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/10 rounded-full border border-white/10 text-white/90 text-xs font-medium">
-              <span className="w-1 h-1 bg-white/80 rounded-full animate-pulse"></span>
-              Quiet rooms, on demand
+          {/* Left Text Column */}
+          <div className="space-y-8 text-left">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-sky-100 dark:bg-sky-900/30 rounded-full border border-sky-200 dark:border-sky-800 text-sky-700 dark:text-sky-300 text-xs font-semibold tracking-wide uppercase">
+              <Sparkles className="w-3.5 h-3.5" />
+              Your space, your rules
             </div>
             
-            {/* Typography with decorative Serif styling for headers */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl text-white font-normal tracking-tight font-serif leading-[1.15]">
-              Find Your Perfect <br />
-              <span className="text-[#e99c4c] italic font-serif font-medium">Study Room</span>
-            </h1>
+            <div className="space-y-4">
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white tracking-tight leading-[1.1]">
+                Focus Deeper in 
+                <span className="block text-[#1b4332] dark:text-emerald-400">Quiet Comfort</span>
+              </h1>
+              <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-lg leading-relaxed">
+                Discover the perfect environment for deep work. Connect with curated study nooks and private workspaces instantly.
+              </p>
+            </div>
             
-            <p className="text-base md:text-lg text-white/80 max-w-xl font-light leading-relaxed">
-              Browse and book quiet, private study rooms in your library by the hour. 
-              List your own room and earn — without the scheduling headaches.
-            </p>
-            
-            {/* Call to Actions */}
-            <div className="flex flex-wrap gap-4 pt-2">
+            {/* Action Buttons */}
+            <div className="flex flex-wrap gap-4">
               <Button
+                as="a"
                 href="/rooms"
-                className="h-12 px-6 text-sm font-semibold bg-[#e99c4c] text-white rounded-xl shadow-lg shadow-black/10 hover:bg-[#d68737] transition-all flex items-center gap-2 group"
+                className="h-12 px-8 bg-[#1b4332] dark:bg-emerald-600 text-white rounded-xl shadow-lg shadow-emerald-900/20 hover:scale-105 transition-transform duration-200 flex items-center gap-2 font-semibold"
               >
-                Explore Rooms <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                Find a Nook <ArrowRight className="w-4 h-4" />
               </Button>
               
               <Button
                 variant="bordered"
-                className="h-12 px-6 text-sm font-medium border-white/20 text-white rounded-xl hover:bg-white/5 transition-all"
+                className="h-12 px-8 border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded-xl hover:bg-white dark:hover:bg-slate-800 transition-all font-semibold"
               >
-                Get Started
+                Learn More
               </Button>
             </div>
 
-            {/* Platform Metrics Segment */}
-            <div className="grid grid-cols-3 gap-6 pt-10 border-t border-white/10 max-w-md">
+            {/* Metrics */}
+            <div className="flex gap-12 pt-8 border-t border-slate-200/50 dark:border-slate-800">
               <div>
-                <p className="text-2xl md:text-3xl font-bold text-white font-serif">120+</p>
-                <p className="text-[11px] text-white/60 uppercase tracking-wider mt-0.5">Rooms listed</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">500+</h3>
+                <p className="text-sm text-slate-500">Verified Spaces</p>
               </div>
               <div>
-                <p className="text-2xl md:text-3xl font-bold text-white font-serif">8K</p>
-                <p className="text-[11px] text-white/60 uppercase tracking-wider mt-0.5">Hours booked</p>
-              </div>
-              <div>
-                <p className="text-2xl md:text-3xl font-bold text-white font-serif flex items-center gap-1">
-                  4.9<span className="text-[#e99c4c] text-xl">★</span>
-                </p>
-                <p className="text-[11px] text-white/60 uppercase tracking-wider mt-0.5">Avg. rating</p>
+                <h3 className="text-2xl font-bold text-slate-900 dark:text-white">4.9/5</h3>
+                <p className="text-sm text-slate-500">User Rating</p>
               </div>
             </div>
           </div>
 
-          {/* Right Image Feature Container */}
-          <div className="relative w-full flex justify-center lg:justify-end">
-            {/* Highlight ambient glow behind image frame */}
-            <div className="absolute -top-12 -right-12 w-72 h-72 bg-yellow-400/10 rounded-full blur-3xl pointer-events-none"></div>
-            
-            <div className="relative w-full max-w-[440px] aspect-[4/5] rounded-[2rem] overflow-hidden shadow-2xl border-4 border-white/5">
+          {/* Right Image Container */}
+          <div className="relative">
+            <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl shadow-sky-200/50 dark:shadow-none border border-white/50">
               <Image
-                src="/assets/hero-cover.jpg" 
-                alt="Library bookshelf study layout"
+                src="/assets/booknook-banner-3.jpg" 
+                alt="Modern quiet study workspace"
                 fill
                 priority
-                className="object-cover"
+                className="object-cover hover:scale-105 transition-transform duration-700"
               />
             </div>
+            {/* Ambient decorative glow */}
+            <div className="absolute -bottom-6 -left-6 w-40 h-40 bg-amber-200/50 rounded-full blur-3xl -z-10"></div>
           </div>
 
         </div>
