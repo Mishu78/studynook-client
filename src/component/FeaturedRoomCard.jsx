@@ -2,79 +2,65 @@ import Image from "next/image";
 import Link from "next/link";
 import { MapPin, Users, CalendarDays } from "lucide-react";
 
-const FeaturedRoomCard = ({ room }) => {
+export const FeaturedRoomCard = ({ room }) => {
   const { _id, roomName, description, image, floor, capacity, hourlyRate, bookingCount, amenities } = room;
 
   return (
-    <div className="group flex flex-col bg-white rounded-2xl border border-slate-200/80 overflow-hidden transition-all duration-300 shadow-sm hover:shadow-md">
+    <div className="group flex flex-col bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2">
       
-      {/* Structural Image Container with specific aspect ratio frame */}
-      <div className="relative aspect-[16/10] overflow-hidden bg-slate-100 shrink-0">
+      {/* Image Area */}
+      <div className="relative h-64 w-full overflow-hidden">
         <Image 
           src={image || 'https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=600'}
-          alt={roomName || "StudyNook Study Room"}
+          alt={roomName}
           fill
-          sizes="(max-w-7xl) 33vw"
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
+          sizes="(max-width: 768px) 100vw, 33vw"
+          className="object-cover group-hover:scale-110 transition-transform duration-700"
         />
-        <div className="absolute top-3 right-3">
-          <span className="bg-[#1b4332] text-white text-[11px] font-bold px-2.5 py-1 rounded-md shadow-sm">
+        {/* Glass Price Tag */}
+        <div className="absolute top-4 left-4 backdrop-blur-md bg-white/70 dark:bg-slate-900/70 border border-white/20 px-4 py-1.5 rounded-full">
+          <span className="text-[#1b4332] dark:text-emerald-400 font-bold text-sm">
             ${hourlyRate}/hr
           </span>
         </div>
       </div>
 
-      {/* Meta Content Layout Body */}
-      <div className="p-5 flex flex-col flex-grow">
-       {/* Updated Meta Title Area to scrub accidental link values */}
-<Link href={`/rooms/${_id}`}>
-  <h4 className="font-serif font-bold text-slate-900 text-lg tracking-tight line-clamp-1 hover:text-[#1b4332] transition-colors mb-2">
-    {roomName?.startsWith("http") ? "Premium Study Nook" : roomName}
-  </h4>
-</Link>
+      {/* Content */}
+      <div className="p-6 flex flex-col flex-grow">
+        <Link href={`/rooms/${_id}`}>
+          <h4 className="font-serif font-bold text-xl text-slate-900 dark:text-white mb-3 group-hover:text-[#1b4332] dark:group-hover:text-emerald-400 transition-colors line-clamp-1">
+            {roomName}
+          </h4>
+        </Link>
         
-        <p className="text-xs text-slate-500 line-clamp-2 mb-4 flex-grow">
+        <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-2 mb-6 leading-relaxed flex-grow">
           {description}
         </p>
 
-        {/* Technical Data Badges Row */}
-        <div className="flex flex-col gap-1.5 border-t border-slate-100 pt-3.5 mb-4 text-xs text-slate-500 font-medium">
+        {/* Meta Info */}
+        <div className="flex flex-col gap-2 border-t border-slate-100 dark:border-slate-800 pt-5 mb-6 text-xs text-slate-500 dark:text-slate-400 font-medium">
           <div className="flex items-center gap-2">
-            <MapPin className="w-3.5 h-3.5 text-slate-400" />
-            <span>{floor || "Main Floor"}</span>
+            <MapPin className="w-4 h-4 text-emerald-600 dark:text-emerald-500" /> {floor || "Main Floor"}
           </div>
           <div className="flex items-center gap-2">
-            <Users className="w-3.5 h-3.5 text-slate-400" />
-            <span>Up to {capacity} people</span>
+            <Users className="w-4 h-4 text-emerald-600 dark:text-emerald-500" /> Up to {capacity} people
           </div>
           {bookingCount !== undefined && (
             <div className="flex items-center gap-2">
-              <CalendarDays className="w-3.5 h-3.5 text-slate-400" />
-              <span>{bookingCount} bookings completed</span>
+              <CalendarDays className="w-4 h-4 text-emerald-600 dark:text-emerald-500" /> {bookingCount} bookings completed
             </div>
           )}
         </div>
 
-        {/* Dynamic Badges Container loop matching your specific arrays */}
-        <div className="flex flex-wrap gap-1.5 mb-1">
+        {/* Amenities */}
+        <div className="flex flex-wrap gap-2">
           {amenities?.slice(0, 3).map((amenity, idx) => (
-            <span 
-              key={idx} 
-              className="text-[10px] font-bold tracking-wide bg-amber-500/10 text-amber-800 px-2 py-0.5 rounded"
-            >
+            <span key={idx} className="text-[10px] font-bold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full">
               {amenity}
             </span>
           ))}
-          {amenities?.length > 3 && (
-            <span className="text-[10px] font-bold bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
-              +{amenities.length - 3} more
-            </span>
-          )}
         </div>
       </div>
-
     </div>
   );
 };
-
-export default FeaturedRoomCard;

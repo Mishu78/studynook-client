@@ -65,13 +65,14 @@ const Hero = () => {
           {/* Right Image Container */}
           <div className="relative">
             <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl shadow-sky-200/50 dark:shadow-none border border-white/50">
-              <Image
-                src="/assets/booknook-banner-3.jpg" 
-                alt="Modern quiet study workspace"
-                fill
-                priority
-                className="object-cover hover:scale-105 transition-transform duration-700"
-              />
+             <Image
+          src="/assets/booknook-banner-3.jpg" 
+          alt="Modern quiet study workspace"
+          fill
+          priority
+          sizes="(max-width: 1024px) 100vw, 50vw"
+          className="object-cover hover:scale-105 transition-transform duration-700"
+          />
             </div>
             {/* Ambient decorative glow */}
             <div className="absolute -bottom-6 -left-6 w-40 h-40 bg-amber-200/50 rounded-full blur-3xl -z-10"></div>

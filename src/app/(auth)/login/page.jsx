@@ -56,7 +56,7 @@ export default function LoginPage() {
     setErrorMessage("");
     await signIn.social({
       provider: "google",
-      callbackURL: "/", // 💡 Google auth logs in directly and takes user Home
+      callbackURL: "http://localhost:3000", // 💡 Google auth logs in directly and takes user Home
     });
   };
 
