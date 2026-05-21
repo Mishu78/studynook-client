@@ -2,109 +2,83 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
+import { Button } from "@heroui/react";
+import { XCircle } from "lucide-react";
+import { toast } from "sonner";
 
-export default function CancelBookingButton({ initialBooking }) {
+export default function CancelBookingButton({ bookingId, status, onCancelSuccess }) {
   const router = useRouter();
-  const [booking, setBooking] = useState(initialBooking);
-  const [isCancelling, setIsCancelling] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  if (!booking) return null;
-
-  // Handle fallback parsing if data format is split into separate fields
-  const displayTime = booking.timeSlot || `${booking.startTime} - ${booking.endTime}`;
-  
-  const displayDate = booking.date 
-    ? new Date(booking.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })
-    : "N/A";
+  // Safely check if the reservation entry is already cancelled
+  const isAlreadyCancelled = status === "cancelled";
 
   const handleCancel = async () => {
-    if (!window.confirm("Are you sure you want to cancel this room reservation?")) {
-      return;
-    }
-
-    setIsCancelling(true);
+    if (isAlreadyCancelled) return;
+    
+    setLoading(true);
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
       
-      const response = await fetch(`${baseUrl}/api/bookings/${booking._id}/cancel`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+      // 🎯 FIXED: URL changed to match your exact /api/bookings/:id/cancel PATCH endpoint
+      const response = await fetch(`${baseUrl}/api/bookings/${bookingId}/cancel`, {
+        method: "PATCH", 
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "include", 
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        // Dynamic UI status switch update loop
-        setBooking((prev) => ({
-          ...prev,
-          status: "cancelled",
-        }));
-        router.refresh();
+      let data = {};
+      const contentType = response.headers.get("content-type");
+      
+      // 🛡️ Safe check for JSON content before parsing
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
       } else {
-        alert(data.error || "Failed to cancel the reservation.");
+        const textError = await response.text();
+        console.error("Raw Server Output Error Trace:", textError);
+        throw new Error(`Server returned non-JSON page (Status ${response.status}).`);
       }
-    } catch (error) {
-      console.error("Cancellation error:", error);
-      alert("A network transmission error occurred.");
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to cancel booking.");
+      }
+
+      // 🎉 SUCCESS TOAST TRIGGER REQUIREMENT
+      toast.success("Booking cancelled", {
+        description: "The reserved study space has been successfully released.",
+      });
+
+      if (onCancelSuccess) {
+        onCancelSuccess(bookingId);
+      }
+
+      // Invalidate the Next.js cache and refresh data lines
+      router.refresh();
+
+    } catch (err) {
+      toast.error(err.message || "An unexpected error occurred during cancellation processing.");
     } finally {
-      setIsCancelling(false);
+      setLoading(false);
     }
   };
 
   return (
-    <tr className="hover:bg-slate-50/40 transition-colors">
-      {/* ROOM CELL */}
-      <td className="py-4 px-6 flex items-center gap-3 min-w-[200px]">
-        <div className="relative w-10 h-8 rounded-md overflow-hidden bg-slate-100 shrink-0 border border-slate-200/40">
-          <Image 
-            src={booking.image || "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=200"}
-            alt={booking.roomName || "Study Room"}
-            fill
-            sizes="40px" // ✅ Added to clean up Next.js lint warning messages
-            className="object-cover"
-          />
-        </div>
-        <span className="font-bold text-slate-800 tracking-tight">{booking.roomName}</span>
-      </td>
-
-      {/* DATE CELL */}
-      <td className="py-4 px-4 text-slate-500 whitespace-nowrap">{displayDate}</td>
-
-      {/* TIME CELL */}
-      <td className="py-4 px-4 text-slate-600 whitespace-nowrap">{displayTime}</td>
-
-      {/* COST CELL */}
-      <td className="py-4 px-4 font-serif font-black text-slate-900">${booking.cost || booking.totalCost}</td>
-
-      {/* STATUS BADGE CELL */}
-      <td className="py-4 px-4">
-        {booking.status === "cancelled" ? (
-          <span className="inline-flex text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100">
-            cancelled
-          </span>
-        ) : (
-          <span className="inline-flex text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
-            confirmed
-          </span>
-        )}
-      </td>
-
-      {/* ACTION TRIGGER CELL */}
-      <td className="py-4 px-6 text-right whitespace-nowrap">
-        {booking.status === "cancelled" ? (
-          <span className="text-slate-400 font-bold block pr-4">—</span>
-        ) : (
-          <button
-            onClick={handleCancel}
-            disabled={isCancelling}
-            className="bg-white hover:bg-slate-50 text-slate-700 font-bold px-4 py-1.5 rounded-xl border border-slate-200 shadow-xs transition-all cursor-pointer disabled:opacity-50 text-xs"
-          >
-            {isCancelling ? "Cancelling..." : "Cancel"}
-          </button>
-        )}
-      </td>
-    </tr>
+    <Button
+      variant="light"
+      color={isAlreadyCancelled ? "default" : "danger"}
+      disabled={isAlreadyCancelled}
+      className={`rounded-xl h-11 px-4 text-xs font-bold gap-1.5 border border-transparent transition-all shrink-0 select-none ${
+        isAlreadyCancelled 
+          ? "opacity-50 cursor-not-allowed text-slate-400 bg-slate-100" 
+          : "hover:border-rose-100 cursor-pointer self-end md:self-auto"
+      }`}
+      isLoading={loading}
+      onClick={handleCancel}
+    >
+      {!loading && <XCircle className="w-4 h-4" />}
+      {isAlreadyCancelled ? "Cancelled" : "Cancel Booking"}
+    </Button>
   );
 }

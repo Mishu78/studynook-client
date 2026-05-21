@@ -23,19 +23,11 @@ async function getUserBookings(email, cookieHeaders) {
 
 export default async function MyBookingsPage() {
   const incomingHeaders = await headers();
-  const cookieHeaders = incomingHeaders.get("cookie") || "";
+  const cookieHeaders = incomingHeaders.get("cookie");
 
-  // 💡 Safe session retrieval configuration
-  let session = null;
-  try {
-    session = await auth.api.getSession({
-      headers: {
-        cookie: cookieHeaders
-      },
-    });
-  } catch (error) {
-    console.error("Auth server handshake stalled:", error.message);
-  }
+  const session = await auth.api.getSession({
+    headers: incomingHeaders,
+  });
 
   if (!session?.user) {
     return (
@@ -59,6 +51,7 @@ export default async function MyBookingsPage() {
           <p className="text-xs font-medium text-slate-400 mt-1">Manage your upcoming and past room reservations.</p>
         </div>
 
+        {/* 5.2 Empty State Condition validation trigger */}
         {bookings.length === 0 ? (
           <div className="bg-white border border-slate-200/60 rounded-[24px] p-12 text-center shadow-xs">
             <p className="text-sm text-slate-400 font-medium">You have no bookings yet.</p>
@@ -82,8 +75,41 @@ export default async function MyBookingsPage() {
                 </thead>
                 <tbody className="divide-y divide-slate-50 text-xs font-semibold text-slate-700">
                   {bookings.map((booking) => (
-                    /* 💡 Pass the complete object reference downstream to encapsulate interactive actions cleanly */
-                    <CancelBookingButton key={booking._id} initialBooking={booking} />
+                    <tr key={booking._id} className="hover:bg-slate-50/40 transition-colors">
+                      <td className="py-4 px-6 flex items-center gap-3 min-w-[200px]">
+                        <div className="relative w-10 h-8 rounded-md overflow-hidden bg-slate-100 shrink-0 border border-slate-200/40">
+                          <Image 
+                            src={booking.image || "https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=200"}
+                            alt={booking.roomName}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                        <span className="font-bold text-slate-800 tracking-tight">{booking.roomName}</span>
+                      </td>
+                      <td className="py-4 px-4 text-slate-500 whitespace-nowrap">{booking.date}</td>
+                      <td className="py-4 px-4 text-slate-600 whitespace-nowrap">{booking.timeSlot}</td>
+                      <td className="py-4 px-4 font-serif font-black text-slate-900">${booking.cost}</td>
+                      <td className="py-4 px-4">
+                        {/* 5.2 Dynamic Status Badge Rendering Configuration */}
+                        {booking.status === "cancelled" ? (
+                          <span className="inline-flex text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 rounded-full bg-rose-50 text-rose-600 border border-rose-100">
+                            cancelled
+                          </span>
+                        ) : (
+                          <span className="inline-flex text-[10px] font-bold tracking-wide uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100">
+                            confirmed
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-4 px-6 text-right whitespace-nowrap">
+                        <CancelBookingButton 
+                          bookingId={booking._id} 
+                          bookingDate={booking.date} 
+                          status={booking.status} 
+                        />
+                      </td>
+                    </tr>
                   ))}
                 </tbody>
               </table>
