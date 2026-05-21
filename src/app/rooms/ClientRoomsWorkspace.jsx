@@ -208,11 +208,12 @@ export default function ClientRoomsWorkspace({ initialRooms = [] }) {
                     ))}
                   </div>
 
-                  <Link href={`/rooms/${room._id}`} className="mt-auto">
-                    <Button variant="bordered" className="w-full rounded-xl border-slate-200 font-medium text-xs text-slate-700 bg-[#fcfbf7]/50 hover:bg-slate-50 py-2 cursor-pointer">
-                      View Details
-                        </Button>
-                  </Link>
+                  {/* 🛑 FIX: Convert MongoDB Object ID safely into a string primitive */}
+<Link href={`/rooms/${room._id.toString()}`} className="mt-auto">
+  <Button variant="bordered" className="w-full rounded-xl border-slate-200 font-medium text-xs text-slate-700 bg-[#fcfbf7]/50 hover:bg-slate-50 py-2 cursor-pointer">
+    View Details
+  </Button>
+</Link>
                 </div>
               </div>
             ))}

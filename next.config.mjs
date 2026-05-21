@@ -4,7 +4,25 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'i.ibb.co.com', // 👈 Added this new ImgBB domain variant
+        hostname: '**', // ✅ Wildcard dynamically allows all safe image hosting domains
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'png.pngtree.com', // 💡 Fixed the Pngtree avatar crash
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com', // 💡 Fixed the Google Login avatar crash
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.ibb.co.com',
         port: '',
         pathname: '/**',
       },

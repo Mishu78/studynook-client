@@ -1,14 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@heroui/react";
-import { signIn } from "@/lib/auth-client"; 
+import { signIn, useSession } from "@/lib/auth-client"; 
 
 export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { data: session, isPending } = useSession(); // 💡 Get active session state
+  
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,24 +18,37 @@ export default function LoginPage() {
 
   const from = searchParams.get("from") || "/";
 
+  // 💡 If a session is already active, auto-redirect away from the login page!
+  useEffect(() => {
+    if (session) {
+      router.push(from);
+      router.refresh();
+    }
+  }, [session, router, from]);
+
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
     setLoading(true);
 
-    const { data, error } = await signIn.email({
-      email,
-      password,
-      callbackURL: from, 
-    });
+    try {
+      const { data, error } = await signIn.email({
+        email: email.trim().toLowerCase(), // 💡 Clean trailing spaces or casing differences
+        password: password,
+        callbackURL: from, 
+      });
 
-    if (error) {
+      if (error) {
+        setLoading(false);
+        setErrorMessage(error.message || "Invalid email or password.");
+      } else {
+        setLoading(false);
+        router.push(from);
+        router.refresh(); 
+      }
+    } catch (err) {
       setLoading(false);
-      setErrorMessage(error.message || "Invalid email or password.");
-    } else {
-      setLoading(false);
-      router.push(from);
-      router.refresh(); 
+      setErrorMessage("An unexpected server connection error occurred.");
     }
   };
 
@@ -41,15 +56,23 @@ export default function LoginPage() {
     setErrorMessage("");
     await signIn.social({
       provider: "google",
-      callbackURL: from,
+      callbackURL: "/", // 💡 Google auth logs in directly and takes user Home
     });
   };
+
+  // Prevent UI flashing while checking session status
+  if (isPending) {
+    return (
+      <div className="min-h-[90vh] bg-[#fcfbf7] flex items-center justify-center">
+        <p className="text-xs text-slate-500 font-medium">Loading session settings...</p>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-[90vh] bg-[#fcfbf7] flex items-center justify-center px-4 py-12">
       <div className="w-full max-w-[440px] bg-white border border-slate-200/60 rounded-[28px] p-8 md:p-10 shadow-xs flex flex-col items-center">
         
-        {/* Brand Rounded Book Icon Box */}
         <div className="w-12 h-12 bg-[#1b4332] rounded-xl flex items-center justify-center mb-5 text-white shrink-0">
           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
@@ -70,8 +93,6 @@ export default function LoginPage() {
         )}
 
         <form onSubmit={handleLoginSubmit} className="w-full space-y-5">
-          
-          {/* Email Input Field Block */}
           <div className="w-full flex flex-col gap-1.5 items-start">
             <label className="text-xs font-bold text-slate-700 px-0.5">Email</label>
             <input
@@ -84,7 +105,6 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Password Input Field Block */}
           <div className="w-full flex flex-col gap-1.5 items-start">
             <label className="text-xs font-bold text-slate-700 px-0.5">Password</label>
             <input
@@ -100,7 +120,7 @@ export default function LoginPage() {
           <Button
             type="submit"
             isLoading={loading}
-            className="w-full bg-[#1b4332] hover:bg-[#143225] text-white font-bold h-11 rounded-xl text-xs mt-2 transition-transform active:scale-[0.99]"
+            className="w-full bg-[#1b4332] hover:bg-[#143225] text-white font-bold h-11 rounded-xl text-xs mt-2"
           >
             Login
           </Button>
@@ -110,15 +130,13 @@ export default function LoginPage() {
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-slate-100"></div>
           </div>
-          <span className="relative bg-white px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">
-            OR
-          </span>
+          <span className="relative bg-white px-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">OR</span>
         </div>
 
         <Button
           variant="bordered"
           onClick={handleGoogleLogin}
-          className="w-full border border-slate-200 hover:border-slate-300 font-bold text-slate-700 bg-white hover:bg-slate-50 h-11 rounded-xl text-xs gap-2 transition-all"
+          className="w-full border border-slate-200 hover:border-slate-300 font-bold text-slate-700 bg-white hover:bg-slate-50 h-11 rounded-xl text-xs gap-2"
         >
           <svg className="w-4 h-4 shrink-0" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -131,9 +149,7 @@ export default function LoginPage() {
 
         <p className="text-xs text-slate-500 font-medium mt-6">
           Don’t have an account?{" "}
-          <Link href="/register" className="text-[#1b4332] font-bold hover:underline">
-            Register
-          </Link>
+          <Link href="/register" className="text-[#1b4332] font-bold hover:underline">Register</Link>
         </p>
 
       </div>

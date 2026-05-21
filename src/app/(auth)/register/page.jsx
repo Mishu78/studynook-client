@@ -22,6 +22,7 @@ export default function RegisterPage() {
     setValidationError("");
     setSuccessMessage("");
 
+    // 💡 Assignment Requirements: Local Inline Input Validation Checkpoints
     if (password.length < 6) {
       setValidationError("Password must be at least 6 characters long.");
       return;
@@ -37,12 +38,18 @@ export default function RegisterPage() {
 
     setLoading(true);
 
-    const { data, error } = await signUp.email({
-      email,
-      password,
-      name,
-      image: photoUrl, 
-    });
+    // 💡 Added the trailing options payload config object to explicitly bypass immediate login session generation
+    const { data, error } = await signUp.email(
+      {
+        email: email.trim().toLowerCase(),
+        password,
+        name: name.trim(),
+        image: photoUrl.trim(), 
+      },
+      {
+        autoSignIn: false // 👈 This strictly blocks Better-Auth from auto-logging them in!
+      }
+    );
 
     if (error) {
       setLoading(false);
@@ -51,6 +58,7 @@ export default function RegisterPage() {
       setLoading(false);
       setSuccessMessage("Registration successful! Please login.");
       
+      // Clear out entry states cleanly so the login form isn't prefilled with a confusing active layout context
       setName("");
       setEmail("");
       setPhotoUrl("");
@@ -64,6 +72,7 @@ export default function RegisterPage() {
 
   const handleGoogleRegistration = async () => {
     setValidationError("");
+    // On Google registration: user is logged in directly and redirected to Home.
     await signIn.social({
       provider: "google",
       callbackURL: "/", 
