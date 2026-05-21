@@ -26,11 +26,12 @@ const FeaturedRoomCard = ({ room }) => {
 
       {/* Meta Content Layout Body */}
       <div className="p-5 flex flex-col flex-grow">
-        <Link href={`/rooms/${_id}`}>
-          <h4 className="font-serif font-bold text-slate-900 text-lg tracking-tight line-clamp-1 hover:text-[#1b4332] transition-colors mb-2">
-            {roomName}
-          </h4>
-        </Link>
+       {/* Updated Meta Title Area to scrub accidental link values */}
+<Link href={`/rooms/${_id}`}>
+  <h4 className="font-serif font-bold text-slate-900 text-lg tracking-tight line-clamp-1 hover:text-[#1b4332] transition-colors mb-2">
+    {roomName?.startsWith("http") ? "Premium Study Nook" : roomName}
+  </h4>
+</Link>
         
         <p className="text-xs text-slate-500 line-clamp-2 mb-4 flex-grow">
           {description}

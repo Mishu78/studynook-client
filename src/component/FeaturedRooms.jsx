@@ -5,11 +5,10 @@ import FeaturedRoomCard from "./FeaturedRoomCard";
 
 const fetchFeaturedRooms = async () => {
   try {
-    // 💡 Using your correct port 8080 configuration with a safe timeout
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8080";
+    // 💡 Harmonized to use localhost line match to match your global configuration
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
     const res = await fetch(`${baseUrl}/featured-rooms`, {
       next: { revalidate: 0 },
-      signal: AbortSignal.timeout(1200)
     });
     
     if (!res.ok) throw new Error("Failed to fetch featured rooms");
@@ -59,10 +58,11 @@ const FeaturedRooms = async () => {
               <FeaturedRoomCard key={room._id} room={room} />
             ))
           ) : (
+            /* 🛡️ RE-WORDED CLEAN EMPTY CONTAINER */
             <div className="col-span-full text-center py-12 bg-white rounded-2xl border border-slate-200/50 p-6 shadow-xs max-w-md mx-auto">
-              <p className="text-sm font-medium text-slate-600 mb-1">No featured rooms found</p>
+              <p className="text-sm font-medium text-slate-600 mb-1">No featured spaces active right now</p>
               <p className="text-xs text-slate-400">
-                Please confirm your backend service is running on port 8080.
+                Check back soon to discover handpicked spaces for your team.
               </p>
             </div>
           )}
