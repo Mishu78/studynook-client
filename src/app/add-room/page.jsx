@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/react";
+import { PlusCircle } from "lucide-react";
+import { toast } from "sonner"; // 🌟 Import the global toast controller
 
 const AMENITY_OPTIONS = [
   "Whiteboard",
@@ -26,8 +28,6 @@ export default function AddRoomPage() {
   const [selectedAmenities, setSelectedAmenities] = useState([]);
 
   const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   // Handle Multi-Checkbox Array Toggling
   const handleAmenityChange = (amenity) => {
@@ -40,8 +40,6 @@ export default function AddRoomPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage("");
-    setSuccessMessage("");
     setLoading(true);
 
     const roomPayload = {
@@ -51,16 +49,17 @@ export default function AddRoomPage() {
       floor: floor.trim(),
       capacity: Number(capacity),
       hourlyRate: Number(hourlyRate),
-      amenities: selectedAmenities, // Array of selected string checkboxes
+      amenities: selectedAmenities,
     };
 
     try {
-      const response = await fetch("http://localhost:8080/api/rooms", {
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const response = await fetch(`${baseUrl}/api/rooms`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // 💡 CRITICAL: Sends the Better-Auth session cookie to your backend middleware!
+        credentials: "include", 
         body: JSON.stringify(roomPayload),
       });
 
@@ -70,9 +69,12 @@ export default function AddRoomPage() {
         throw new Error(data.error || "Failed to create room.");
       }
 
-      setSuccessMessage("Room added successfully! Redirecting...");
+      // 🎉 TRIGGER THE BEAUTIFUL GLOBAL SUCCESS TOAST
+      toast.success("Room created successfully!", {
+        description: "Redirecting you back to your spaces inventory catalogue.",
+      });
       
-      // Reset Form State
+      // Clear Form Fields immediately
       setRoomName("");
       setDescription("");
       setImage("");
@@ -81,13 +83,15 @@ export default function AddRoomPage() {
       setHourlyRate("");
       setSelectedAmenities([]);
 
-      // Redirect user back to public listings catalog view
+      // Route syncing transition
       setTimeout(() => {
-        router.push("/rooms");
+        router.refresh(); 
+        router.push("/rooms"); 
       }, 2000);
 
     } catch (err) {
-      setErrorMessage(err.message || "An unexpected network connection problem occurred.");
+      // 🛑 TRIGGER GLOBAL ERROR TOAST (No more ugly native window alerts)
+      toast.error(err.message || "An unexpected network communication error occurred.");
     } finally {
       setLoading(false);
     }
@@ -99,9 +103,7 @@ export default function AddRoomPage() {
         
         <div className="flex flex-col items-center mb-8">
           <div className="w-12 h-12 bg-[#1b4332] rounded-xl flex items-center justify-center mb-4 text-white">
-            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-            </svg>
+            <PlusCircle className="w-6 h-6" />
           </div>
           <h1 className="text-[26px] font-serif font-bold text-slate-900 tracking-tight text-center mb-1">
             Add Study Room
@@ -110,19 +112,6 @@ export default function AddRoomPage() {
             List a new space configuration block inside the StudyNook network.
           </p>
         </div>
-
-        {/* Dynamic Context Status Indicators */}
-        {errorMessage && (
-          <div className="w-full bg-rose-50 border border-rose-100 text-rose-600 text-xs font-semibold px-4 py-2.5 rounded-xl mb-6 text-center">
-            {errorMessage}
-          </div>
-        )}
-
-        {successMessage && (
-          <div className="w-full bg-emerald-50 border border-emerald-100 text-emerald-700 text-xs font-semibold px-4 py-2.5 rounded-xl mb-6 text-center">
-            {successMessage}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           
@@ -139,13 +128,13 @@ export default function AddRoomPage() {
             />
           </div>
 
-          {/* Description Textarea */}
+          {/* Description */}
           <div className="flex flex-col gap-1.5 items-start">
             <label className="text-xs font-bold text-slate-700 px-0.5">Description</label>
             <textarea
               required
               rows={4}
-              placeholder="Provide clean instructions, setup layout patterns, or specific ground notes regarding the study room space allocation boundary..."
+              placeholder="Provide clean instructions, setup layout patterns..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="w-full bg-slate-50/40 border border-slate-200/80 hover:border-slate-300 focus:border-[#1b4332] focus:outline-none p-4 rounded-xl text-xs font-medium text-slate-800 placeholder:text-slate-400 transition-colors resize-none"
@@ -165,10 +154,8 @@ export default function AddRoomPage() {
             />
           </div>
 
-          {/* Inline Grid Row split layout for numbers */}
+          {/* Metrics Rows Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            
-            {/* Floor Location identifier */}
             <div className="flex flex-col gap-1.5 items-start">
               <label className="text-xs font-bold text-slate-700 px-0.5">Floor Location</label>
               <input
@@ -181,7 +168,6 @@ export default function AddRoomPage() {
               />
             </div>
 
-            {/* Capacity tracking number */}
             <div className="flex flex-col gap-1.5 items-start">
               <label className="text-xs font-bold text-slate-700 px-0.5">Max Capacity</label>
               <input
@@ -195,7 +181,6 @@ export default function AddRoomPage() {
               />
             </div>
 
-            {/* Hourly Rate pricing index metrics */}
             <div className="flex flex-col gap-1.5 items-start">
               <label className="text-xs font-bold text-slate-700 px-0.5">Hourly Rate ($)</label>
               <input
@@ -210,7 +195,7 @@ export default function AddRoomPage() {
             </div>
           </div>
 
-          {/* Checkbox Matrix block for space tracking amenities configurations */}
+          {/* Amenities Grid */}
           <div className="flex flex-col gap-2 items-start pt-2">
             <label className="text-xs font-bold text-slate-700 px-0.5">Included Amenities</label>
             <div className="grid grid-cols-2 gap-3 w-full">
